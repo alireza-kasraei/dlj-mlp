@@ -1,12 +1,6 @@
 package net.devk;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import ai.djl.Device;
-import ai.djl.MalformedModelException;
 import ai.djl.Model;
 import ai.djl.basicdataset.cv.classification.Mnist;
 import ai.djl.basicmodelzoo.basic.Mlp;
@@ -20,18 +14,21 @@ import ai.djl.training.loss.Loss;
 import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 
-/**
- * Hello world!
- */
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+
 public class MnistTrainer {
-    public static void main(String[] args) throws IOException, TranslateException, MalformedModelException {
+    public static void main(String[] args) throws IOException, TranslateException {
 
         int batchSize = 32;
         Mnist mnist = Mnist.builder().optDevice(Device.gpu()).setSampling(batchSize, true).build();
         mnist.prepare(new ProgressBar());
 
-        Model model = Model.newInstance("mlp",Device.gpu());
-        model.setBlock(new Mlp(28 * 28, 10, new int[] { 128, 64 }));
+        Model model = Model.newInstance("mlp", Device.gpu());
+        model.setBlock(new Mlp(28 * 28, 10, new int[]{128, 64}));
 
         DefaultTrainingConfig config = new DefaultTrainingConfig(Loss.softmaxCrossEntropyLoss())
                 // softmaxCrossEntropyLoss is a standard loss for classification problems

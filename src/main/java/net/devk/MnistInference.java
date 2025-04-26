@@ -1,12 +1,5 @@
 package net.devk;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import ai.djl.Device;
 import ai.djl.MalformedModelException;
 import ai.djl.Model;
@@ -22,17 +15,22 @@ import ai.djl.translate.TranslateException;
 import ai.djl.translate.Translator;
 import ai.djl.translate.TranslatorContext;
 
-/**
- * Hello world!
- */
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+
 public class MnistInference {
     public static void main(String[] args) throws IOException, MalformedModelException, TranslateException {
-        var img = ImageFactory.getInstance().fromFile(Paths.get("/home/ali/mnist/2.png"));
+        var img = ImageFactory.getInstance().fromInputStream(MnistInference.class.getResourceAsStream("/1.png"));
         img.getWrappedImage();
 
         Path modelDir = Paths.get("build/mlp");
         Model model = Model.newInstance("mlp", Device.gpu());
-        model.setBlock(new Mlp(28 * 28, 10, new int[] { 128, 64 }));
+        model.setBlock(new Mlp(28 * 28, 10, new int[]{128, 64}));
         model.load(modelDir);
 
         Translator<Image, Classifications> translator = new Translator<Image, Classifications>() {
@@ -66,10 +64,12 @@ public class MnistInference {
 
         var classifications = predictor.predict(img);
 
-        List<String> classNames = classifications.getClassNames();
-        for (int i = 0; i < classNames.size(); i++) {
-            System.out.printf("%s : %.20f%n", classNames.get(i), classifications.getProbabilities().get(i));
-        }
+        System.out.println(classifications.topK());
+
+//        List<Classifications.Classification> classifications1 = classifications.topK();
+//        for (int i = 0; i < classNames.size(); i++) {
+//            System.out.printf("%s : %.20f%n", classNames.get(i), classifications.getProbabilities().get(i));
+//        }
 
     }
 }
